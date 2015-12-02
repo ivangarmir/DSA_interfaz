@@ -244,9 +244,9 @@ public class FrameDSA extends javax.swing.JFrame {
     private void btnFirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFirmarActionPerformed
         // TODO add your handling code here:
         salida = salida.concat("Se esta firmando el mensaje.\nEsto puede tardar unos minutos.\n");
-        clave = dsa.generate();
+        clave = dsa.generarClave();
         salida = salida.concat("La clave se ha creado correctamente.\n");
-        rubrica = dsa.generateR();
+        rubrica = dsa.generaRubrica();
         salida = salida.concat("La rubrica se ha creado correctamente.\n");
         firma = dsa.firmar(rubrica, datosBytes);
         salida = salida.concat("La firma se ha creado correctamente.\n");

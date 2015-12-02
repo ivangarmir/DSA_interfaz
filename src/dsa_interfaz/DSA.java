@@ -17,15 +17,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DSA {
+    
+    private int TAMP=1024;
+    private int TAMQ=160;
 
-    private int primeCenterie = 20;
+    private int tolerancia = 10;
     private BigInteger q;
     private BigInteger p;
     private BigInteger g;
     private BigInteger y;
     private BigInteger x;
     private BigInteger k;
-    private Random rand = new Random();
 
     public DSA() {
     BigInteger q=null;
@@ -36,51 +38,51 @@ public class DSA {
     BigInteger k=null;
     }
 
-    public BigInteger generate() {
-        q = new BigInteger(160, primeCenterie, rand);
-        p = generateP(q, 1024);
-        g = generateG(p, q);
+    public BigInteger generarClave() {
+        q = new BigInteger(TAMQ, tolerancia, new Random());
+        p = generaP(q, 1024);
+        g = generaG(p, q);
         do {
-            x = new BigInteger(q.bitCount(), rand);
+            x = new BigInteger(q.bitCount(), new Random());
         } while (x.compareTo(BigInteger.ZERO) != 1 && x.compareTo(q) != -1);
         y = g.modPow(x, p);
         return y;
     }
 
-    private BigInteger generateP(BigInteger q, int l) {
+    private BigInteger generaP(BigInteger q, int l) {
         if (l % 64 != 0) {
             throw new IllegalArgumentException("El valor L no es correcto");
         }
         BigInteger pTemp;
         BigInteger pTemp2;
         do {
-            pTemp = new BigInteger(l, primeCenterie, rand);
+            pTemp = new BigInteger(l, tolerancia, new Random());
             pTemp2 = pTemp.subtract(BigInteger.ONE);
             pTemp = pTemp.subtract(pTemp2.remainder(q));
-        } while (!pTemp.isProbablePrime(primeCenterie) || pTemp.bitLength() != l);
+        } while (!pTemp.isProbablePrime(tolerancia) || pTemp.bitLength() != l);
         return pTemp;
     }
 
-    private BigInteger generateG(BigInteger p, BigInteger q) {
+    private BigInteger generaG(BigInteger p, BigInteger q) {
         BigInteger aux = p.subtract(BigInteger.ONE);
         BigInteger pow = aux.divide(q);
         BigInteger gTemp;
         do {
-            gTemp = new BigInteger(aux.bitLength(), rand);
+            gTemp = new BigInteger(aux.bitLength(), new Random());
         } while (gTemp.compareTo(aux) != -1 && gTemp.compareTo(BigInteger.ONE) != 1);
         return gTemp.modPow(pow, p);
     }
 
-    public BigInteger generateR() {
-        k = generateK(q);
+    public BigInteger generaRubrica() {
+        k = generaK(q);
         BigInteger r = g.modPow(k, p).mod(q);
         return r;
     }
 
-    public BigInteger generateK(BigInteger q) {
+    public BigInteger generaK(BigInteger q) {
         BigInteger tempK;
         do {
-            tempK = new BigInteger(q.bitLength(), rand);
+            tempK = new BigInteger(q.bitLength(), new Random());
         } while (tempK.compareTo(q) != -1 && tempK.compareTo(BigInteger.ZERO) != 1);
         return tempK;
     }
