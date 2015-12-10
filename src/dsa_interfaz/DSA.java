@@ -1,13 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Implementación del algoritmo de cifrado DSA
  */
 package dsa_interfaz;
 
 /**
  *
- * @author ivan
+ * @author Ivan Garcia y Alvaro Alonso
  */
 import java.math.BigInteger;
 import java.util.Random;
@@ -16,12 +14,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//Clase DSA
 public class DSA {
-    
+    //Inicializacion de constantes
+    //Tamaño del P
     private int TAMP=1024;
+    //tamaño del Q
     private int TAMQ=160;
-
+    //tolerancia de error del numero primo
     private int tolerancia = 10;
+    
     private BigInteger q;
     private BigInteger p;
     private BigInteger g;
@@ -29,6 +31,7 @@ public class DSA {
     private BigInteger x;
     private BigInteger k;
 
+    //Constructor de la clase
     public DSA() {
     BigInteger q=null;
     BigInteger p=null;
@@ -38,7 +41,9 @@ public class DSA {
     BigInteger k=null;
     }
 
+    //metodo encargado de generar la clave privada
     public BigInteger generarClave() {
+        //Buscamos un numero P y Q
         q = new BigInteger(TAMQ, tolerancia, new Random());
         p = generaP(q, 1024);
         g = generaG(p, q);
@@ -49,6 +54,7 @@ public class DSA {
         return y;
     }
 
+    //metodo encargado de generar el numero P a partir de un numero Q y una longitud L
     private BigInteger generaP(BigInteger q, int l) {
         if (l % 64 != 0) {
             throw new IllegalArgumentException("El valor L no es correcto");
@@ -63,6 +69,7 @@ public class DSA {
         return pTemp;
     }
 
+    //metodo encargado de generar el numero G a partir de P y Q
     private BigInteger generaG(BigInteger p, BigInteger q) {
         BigInteger aux = p.subtract(BigInteger.ONE);
         BigInteger pow = aux.divide(q);
@@ -73,12 +80,14 @@ public class DSA {
         return gTemp.modPow(pow, p);
     }
 
+    //metodo encargado de generar la rubrica
     public BigInteger generaRubrica() {
         k = generaK(q);
         BigInteger r = g.modPow(k, p).mod(q);
         return r;
     }
 
+    //metodo encargado de generar la K
     public BigInteger generaK(BigInteger q) {
         BigInteger tempK;
         do {
@@ -87,13 +96,16 @@ public class DSA {
         return tempK;
     }
 
+    //metodo encargado de firmar el mensaje
     public BigInteger firmar(BigInteger r, byte[] data) {
+        // Se genera un hash SHA-1 del mensaje y se firma
         MessageDigest md;
         BigInteger s = BigInteger.ONE;
         try {
             md = MessageDigest.getInstance("SHA-1");
             md.update(data);
             BigInteger hash = new BigInteger(md.digest());
+            //Se realiza la firma
             s = (k.modInverse(q).multiply(hash.add(x.multiply(r)))).mod(q);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(DSA.class.getName()).log(Level.SEVERE, null, ex);
@@ -101,6 +113,7 @@ public class DSA {
         return s;
     }
     
+    //metodo encargado de comprobar la firma con la rubrica
     boolean verifica(byte[] data, BigInteger r, BigInteger s) {
         if (r.compareTo(BigInteger.ZERO) <= 0 || r.compareTo(q) >= 0) {
             return false;
@@ -111,9 +124,11 @@ public class DSA {
         MessageDigest md;
         BigInteger v = BigInteger.ZERO;
         try {
+            //Calculamos el hash sha-1 del mensaje
             md = MessageDigest.getInstance("SHA-1");
             md.update(data);
             BigInteger hash = new BigInteger(md.digest());
+            //Comprobamos que es correcto
             BigInteger w = s.modInverse(q);
             BigInteger u1 = hash.multiply(w).mod(q);
             BigInteger u2 = r.multiply(w).mod(q);

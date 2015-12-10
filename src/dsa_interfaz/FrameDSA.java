@@ -1,24 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Implementación del algoritmo de cifrado DSA
  */
 package dsa_interfaz;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author ivan
+ * @author Ivan Garcia y Alvaro Alonso
  */
 public class FrameDSA extends javax.swing.JFrame {
 
     /**
      * Creates new form FrameDSA
      */
+    //variables de la interfaz
     BigInteger firma = null;
     BigInteger rubrica = null;
     BigInteger mensajeFirmado = null;
@@ -220,9 +217,9 @@ public class FrameDSA extends javax.swing.JFrame {
     private void txtRubricaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRubricaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRubricaActionPerformed
-
+//Este metodo se llama cuando se pulsa el bootn de cargar datos
     private void btnCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarActionPerformed
-        // TODO add your handling code here:
+        //cargamos los datos dle formulario
         if (txtMensaje.getText().compareTo("") != 0) {
             datosBytes = txtMensaje.getText().getBytes(Charset.forName("UTF-8"));
             salida = salida.concat("El mensaje se ha guardado correctamente.\n");
@@ -240,14 +237,17 @@ public class FrameDSA extends javax.swing.JFrame {
         // TODO add your handling code here:
 
     }//GEN-LAST:event_txtFirmaActionPerformed
-
+// Este metodo se acciona al pulsar el boton de firmar
     private void btnFirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFirmarActionPerformed
         // TODO add your handling code here:
         salida = salida.concat("Se esta firmando el mensaje.\nEsto puede tardar unos minutos.\n");
+        //generamos la clave
         clave = dsa.generarClave();
         salida = salida.concat("La clave se ha creado correctamente.\n");
+        //generamos la rubrica
         rubrica = dsa.generaRubrica();
         salida = salida.concat("La rubrica se ha creado correctamente.\n");
+        //firmamos el mensaje
         firma = dsa.firmar(rubrica, datosBytes);
         salida = salida.concat("La firma se ha creado correctamente.\n");
         txtClave.setText(clave.toString());
@@ -257,11 +257,12 @@ public class FrameDSA extends javax.swing.JFrame {
         btnComprobar.setEnabled(true);
         txtSalida.setText(salida);
     }//GEN-LAST:event_btnFirmarActionPerformed
-
+//Este metodo se acciona al pulsar el boton de comprobar firma
     private void btnComprobarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComprobarActionPerformed
         // TODO add your handling code here:
         rubrica = new BigInteger(txtRubrica.getText());
         firma = new BigInteger(txtFirma.getText());
+        //Llamamos al metodo verificar de DSA, se le pasa por parametro el array de datos, la rubrica y la firma
         esCorrecta = dsa.verifica(datosBytes, rubrica, firma);
         if (esCorrecta == true) {
             salida = salida.concat("La firma es correcta.\n");
@@ -270,9 +271,9 @@ public class FrameDSA extends javax.swing.JFrame {
         }
         txtSalida.setText(salida);
     }//GEN-LAST:event_btnComprobarActionPerformed
-
+//Este metodo se acciona al pulsar el boton borrar
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        //rstablece la interfaz
         salida = "";
         txtMensaje.setText("");
         txtMensaje.setEditable(true);
